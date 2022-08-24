@@ -41,6 +41,7 @@ class Venue(db.Model):
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    shows = db.relationship("Show", backref="venues", lazy="False")
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -55,6 +56,7 @@ class Artist(db.Model):
     genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    shows = db.relationship('Show', backref="artists", lazy="False", )
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
@@ -88,7 +90,9 @@ app.jinja_env.filters['datetime'] = format_datetime
 
 @app.route('/')
 def index():
-  return render_template('pages/home.html')
+  venues = Venue.query.order_by(db.desc(Venue.created_at))
+  artists = Artist.query.order_by(db.desc(Artist.created_at))
+  return render_template('pages/home.html', venues=venues, artists=artists)
 
 
 #  Venues
@@ -98,27 +102,27 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_upcoming_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
+  # data=[{
+  #   "city": "San Francisco",
+  #   "state": "CA",
+  #   "venues": [{
+  #     "id": 1,
+  #     "name": "The Musical Hop",
+  #     "num_upcoming_shows": 0,
+  #   }, {
+  #     "id": 3,
+  #     "name": "Park Square Live Music & Coffee",
+  #     "num_upcoming_shows": 1,
+  #   }]
+  # }, {
+  #   "city": "New York",
+  #   "state": "NY",
+  #   "venues": [{
+  #     "id": 2,
+  #     "name": "The Dueling Pianos Bar",
+  #     "num_upcoming_shows": 0,
+  #   }]
+  # }]
   return render_template('pages/venues.html', areas=data);
 
 @app.route('/venues/search', methods=['POST'])
